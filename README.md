@@ -4,4 +4,4 @@ This source code is about handling long running process triggered from any ajax 
 
 ![application running](https://github.com/itorian/run-ajax-post-or-get-triggered-long-running-process-or-task-and-display-its-status-on-progress-bar/blob/master/1.png)
 
-![application running with progress bar and console log](https://github.com/itorian/run-ajax-post-or-get-triggered-long-running-process-or-task-and-display-its-status-on-progress-bar/blob/master/1.png)
+![application running with progress bar and console log](https://github.com/itorian/run-ajax-post-or-get-triggered-long-running-process-or-task-and-display-its-status-on-progress-bar/blob/master/2.png)
