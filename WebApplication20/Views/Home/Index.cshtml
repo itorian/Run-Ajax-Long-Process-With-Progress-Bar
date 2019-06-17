@@ -1,0 +1,57 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="row">
+    <div class="col-12">
+        <button class="btn btn-primary runlongtask">
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;"></span>
+            Run ajax post long task and display on progress bar
+        </button>
+    </div>
+    <div class="col-12 pt-5">
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="width:0%"></div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(function () {
+
+            $('.runlongtask').click(function () {
+                var triggerbtn = $(this);
+                triggerbtn.prop('disabled', true).children('.spinner-border').show();
+                $.ajax({
+                    type: 'POST',
+                    url: '/home/runlongtask',
+                    success: function (data) {
+                        if (data.status) {
+                            longTaskUpdateProgress(data.ProgressCurrent, data.ProgressMax, data.ProgressPercent);
+                            triggerbtn.prop('disabled', false).children('.spinner-border').hide();
+                            window.clearInterval(longTaskInterval);
+                        }
+                    }
+                });
+
+                var longTaskInterval = window.setInterval(function () {
+                    $.getJSON('/home/sometaskprogress', function (data) {
+                        longTaskUpdateProgress(data.ProgressCurrent, data.ProgressMax, data.ProgressPercent);
+                    });
+                }, 5000);
+
+                var longTaskUpdateProgress = function (ProgressCurrent, ProgressMax, ProgressPercent) {
+                    $('.progress-bar')
+                        .attr('aria-valuenow', ProgressPercent)
+                        .css('width', ProgressPercent + '%')
+                        .html(ProgressPercent + '% Completed');
+
+                    console.log(ProgressPercent + ' Completed');
+                    console.log(ProgressCurrent + ' executed out of ' + ProgressMax);
+                };
+            });
+
+        })
+    </script>
+}
