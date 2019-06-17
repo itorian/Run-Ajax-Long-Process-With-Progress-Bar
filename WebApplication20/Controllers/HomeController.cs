@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Web.Mvc;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace WebApplication20.Controllers
@@ -15,7 +16,7 @@ namespace WebApplication20.Controllers
         public async Task<ActionResult> RunLongTask()
         {
             string id = "task_id";  //should be unique for every task
-            int maxcount = 100000000;
+            int maxcount = 200;
 
             AsyncManager.OutstandingOperations.Increment();
             await Task.Factory.StartNew(taskId =>
@@ -23,7 +24,7 @@ namespace WebApplication20.Controllers
                 HttpContext.Application["t_max_" + taskId] = maxcount;
                 for (int i = 0; i < maxcount; i++)
                 {
-                    //Thread.Sleep(200);
+                    Thread.Sleep(100);
                     HttpContext.Application["t_prog_" + taskId] = i;
                 }
                 AsyncManager.OutstandingOperations.Decrement();
