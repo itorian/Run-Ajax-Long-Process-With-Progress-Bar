@@ -1,6 +1,5 @@
 using System;
 using System.Web.Mvc;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace WebApplication20.Controllers
@@ -19,12 +18,12 @@ namespace WebApplication20.Controllers
             int maxcount = 200;
 
             AsyncManager.OutstandingOperations.Increment();
-            await Task.Factory.StartNew(taskId =>
+            await Task.Factory.StartNew(async taskId =>
             {
                 HttpContext.Application["t_max_" + taskId] = maxcount;
                 for (int i = 0; i < maxcount; i++)
                 {
-                    Thread.Sleep(100);
+                    await Task.Delay(100);
                     HttpContext.Application["t_prog_" + taskId] = i;
                 }
                 AsyncManager.OutstandingOperations.Decrement();
@@ -33,7 +32,7 @@ namespace WebApplication20.Controllers
             return Json(new { status = true, ProgressCurrent = maxcount, ProgressMax = maxcount, ProgressPercent = 100 });
         }
 
-        public ActionResult SomeTaskProgress()
+        public ActionResult CheckTaskProgress()
         {
             string id = "task_id";  //should be unique for every task
 

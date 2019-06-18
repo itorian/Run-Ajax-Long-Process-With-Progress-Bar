@@ -1,12 +1,12 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Run ajax long running process and display on progress bar";
 }
 
 <div class="row">
     <div class="col-12">
         <button class="btn btn-primary runlongtask">
             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;"></span>
-            Run ajax post long task and display on progress bar
+            Run ajax long running process and display on progress bar
         </button>
     </div>
     <div class="col-12 pt-5">
@@ -21,23 +21,22 @@
         $(function () {
 
             $('.runlongtask').click(function () {
+
                 var triggerbtn = $(this);
                 triggerbtn.prop('disabled', true).children('.spinner-border').show();
+
                 $.ajax({
                     type: 'POST',
-                    url: '/home/runlongtask',
-                    success: function (data) {
-                        if (data.status) {
-                            longTaskUpdateProgress(data.ProgressCurrent, data.ProgressMax, data.ProgressPercent);
-                            triggerbtn.prop('disabled', false).children('.spinner-border').hide();
-                            window.clearInterval(longTaskInterval);
-                        }
-                    }
+                    url: '/home/runlongtask'
                 });
 
                 var longTaskInterval = window.setInterval(function () {
-                    $.getJSON('/home/sometaskprogress', function (data) {
-                        longTaskUpdateProgress(data.ProgressCurrent, data.ProgressMax, data.ProgressPercent);
+                    $.ajax({
+                        type: 'GET',
+                        url: '/home/checktaskprogress',
+                        success: function (data) {
+                            longTaskUpdateProgress(data.ProgressCurrent, data.ProgressMax, data.ProgressPercent);
+                        }
                     });
                 }, 5000);
 
@@ -46,6 +45,11 @@
                         .attr('aria-valuenow', ProgressPercent)
                         .css('width', ProgressPercent + '%')
                         .html(ProgressPercent + '% Completed');
+
+                    if (ProgressPercent === 100) {
+                        triggerbtn.prop('disabled', false).children('.spinner-border').hide();
+                        window.clearInterval(longTaskInterval);
+                    }
 
                     console.log(ProgressPercent + ' Completed');
                     console.log(ProgressCurrent + ' executed out of ' + ProgressMax);
