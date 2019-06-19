@@ -31,29 +31,32 @@
                 });
 
                 var longTaskInterval = window.setInterval(function () {
+                    console.log('interval func invoked');
                     $.ajax({
                         type: 'GET',
                         url: '/home/checktaskprogress',
                         success: function (data) {
                             longTaskUpdateProgress(data.ProgressCurrent, data.ProgressMax, data.ProgressPercent);
+                            if (data.ProgressCurrent == data.ProgressMax || data.ProgressPercent === 100) {
+                                longTaskUpdateProgress(data.ProgressMax, data.ProgressMax, 100);
+                                triggerbtn.prop('disabled', false).children('.spinner-border').hide();
+                                window.clearInterval(longTaskInterval);
+                            }
                         }
                     });
                 }, 5000);
 
                 var longTaskUpdateProgress = function (ProgressCurrent, ProgressMax, ProgressPercent) {
+                    console.log('progressbar func invoked');
                     $('.progress-bar')
                         .attr('aria-valuenow', ProgressPercent)
                         .css('width', ProgressPercent + '%')
                         .html(ProgressPercent + '% Completed');
 
-                    if (ProgressPercent === 100) {
-                        triggerbtn.prop('disabled', false).children('.spinner-border').hide();
-                        window.clearInterval(longTaskInterval);
-                    }
-
-                    console.log(ProgressPercent + ' Completed');
+                    console.log(ProgressPercent + '% Completed');
                     console.log(ProgressCurrent + ' executed out of ' + ProgressMax);
                 };
+
             });
 
         })

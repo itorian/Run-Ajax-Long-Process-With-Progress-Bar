@@ -14,14 +14,14 @@ namespace WebApplication20.Controllers
         [HttpPost]
         public async Task<ActionResult> RunLongTask()
         {
-            string id = "task_id";  //should be unique for every task
+            string id = "task_id";  //should be unique
             int maxcount = 200;
 
             AsyncManager.OutstandingOperations.Increment();
             await Task.Factory.StartNew(async taskId =>
             {
                 HttpContext.Application["t_max_" + taskId] = maxcount;
-                for (int i = 0; i < maxcount; i++)
+                for (int i = 1; i <= maxcount; i++)
                 {
                     await Task.Delay(100);
                     HttpContext.Application["t_prog_" + taskId] = i;
@@ -34,7 +34,7 @@ namespace WebApplication20.Controllers
 
         public ActionResult CheckTaskProgress()
         {
-            string id = "task_id";  //should be unique for every task
+            string id = "task_id";  //should be unique
 
             var progressCurrent = HttpContext.Application["t_prog_" + id];
             var progressMax = HttpContext.Application["t_max_" + id];
