@@ -14,30 +14,25 @@ namespace WebApplication20.Controllers
         [HttpPost]
         public async Task<ActionResult> RunLongTask()
         {
-            string id = "task_id";  //should be unique
             int maxcount = 200;
 
-            AsyncManager.OutstandingOperations.Increment();
-            await Task.Factory.StartNew(async taskId =>
+            await Task.Run(async () =>
             {
-                HttpContext.Application["t_max_" + taskId] = maxcount;
+                HttpContext.Application["t_max"] = maxcount; // prefer using azure storage queue to store this
                 for (int i = 1; i <= maxcount; i++)
                 {
                     await Task.Delay(100);
-                    HttpContext.Application["t_prog_" + taskId] = i;
+                    HttpContext.Application["t_prog"] = i; // prefer using azure storage queue to store this
                 }
-                AsyncManager.OutstandingOperations.Decrement();
-            }, id);
+            });
 
             return Json(new { status = true, ProgressCurrent = maxcount, ProgressMax = maxcount, ProgressPercent = 100 });
         }
 
         public ActionResult CheckTaskProgress()
         {
-            string id = "task_id";  //should be unique
-
-            var progressCurrent = HttpContext.Application["t_prog_" + id];
-            var progressMax = HttpContext.Application["t_max_" + id];
+            var progressCurrent = HttpContext.Application["t_prog"]; // prefer using azure storage queue to store this
+            var progressMax = HttpContext.Application["t_max"]; // prefer using azure storage queue to store this
             decimal progressPercent = (Convert.ToDecimal(progressCurrent) / Convert.ToDecimal(progressMax)) * 100M;
 
             return Json(new
